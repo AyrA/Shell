@@ -316,8 +316,8 @@
 				<h2>Settings</h2>
 				<form method="post" action="' . he(selfurl()) . '?action=settings">
 					<input type="hidden" name="mode" value="performance" />
-					<label><input type="checkbox" name="unsafe-crypto" value="1" ' . (av($config,'unsafe-crypto')?'checked':'') . ' /> Show unsafe cryptographic algorithms</label><br />
-					<small>Shows unsafe algorithms in the file encryption utility</small><br />
+					<label><input type="checkbox" name="unsafe-crypto" value="1" ' . (av($config,'unsafe-crypto')?'checked':'') . ' /> Show unsafe/invalid cryptographic algorithms</label><br />
+					<small>Shows unsafe and non-working algorithms in the file encryption utility</small><br />
 					<label><input type="checkbox" name="ini-strip-comments" value="1" ' . (av($config,'ini-strip-comments')?'checked':'') . ' /> Strip comments in PHP ini</label><br />
 					<small>Removes comments and empty lines from the PHP ini file in the info viewer</small><br />
 					<label><input type="checkbox" name="fastmedia" value="1" ' . (av($config,'fastmedia')?'checked':'') . ' /> Detect file type by file extension only</label><br />
