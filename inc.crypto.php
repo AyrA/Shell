@@ -10,9 +10,14 @@
 		//ECB and XTS modes are not good methods for file encryption
 		'#-(ecb|xts)$#i'
 		));
+	//Default algorithm
 	define('CRYPTO_DEFAULT','aes-256-gcm');
+	//Header magic
 	define('CRYPTO_HEADER','CRYPT');
+	//Default number of pbkdf2 rounds
 	define('CRYPTO_ROUNDS',50000);
+	//Algorithm in use for hmac function
+	define('CRYPTO_HMAC','sha256');
 
 	//Read big endian integer from file
 	function enc_read_int($fp,$size){
@@ -40,6 +45,7 @@
 			'mode'=>NULL,
 			'iv'=>NULL,
 			'salt'=>NULL,
+			'hmac'=>NULL,
 			'rounds'=>NULL,
 			'datalen'=>NULL,
 			'tag'=>NULL
@@ -74,6 +80,7 @@
 			enc_write_prefixed_bytes($fp,$header['mode'],2);
 			enc_write_prefixed_bytes($fp,$header['iv'],2);
 			enc_write_prefixed_bytes($fp,$header['salt'],2);
+			enc_write_prefixed_bytes($fp,$header['hmac'],2);
 			enc_write_int($fp,$header['rounds'],4);
 			enc_write_prefixed_bytes($fp,$data,8);
 			enc_write_prefixed_bytes($fp,$header['tag'],2);
@@ -95,6 +102,7 @@
 				$header['mode']=enc_read_prefixed_bytes($fp,2);
 				$header['iv']=enc_read_prefixed_bytes($fp,2);
 				$header['salt']=enc_read_prefixed_bytes($fp,2);
+				$header['hmac']=enc_read_prefixed_bytes($fp,2);
 				$header['rounds']=enc_read_int($fp,4);
 				$header['datalen']=enc_read_int($fp,8);
 				if($header['datalen']>0){
@@ -230,9 +238,10 @@
 		if($info){
 			$header_tbl.='<h2>Encrypted file details</h2>';
 			$header_tbl.='<table><tr><th>Mode</th><td>' . he($info['mode']) . '</td></tr>';
-			$header_tbl.='<tr><th>iv</th><td>' . he(base64_encode($info['iv'])) . '</td></tr>';
-			$header_tbl.='<tr><th>tag</th><td>' . he(base64_encode($info['tag'])) . '</td></tr>';
-			$header_tbl.='<tr><th>salt</th><td>' . he(base64_encode($info['salt'])) . '</td></tr>';
+			$header_tbl.='<tr><th>iv</th><td>' . he(bin2hex($info['iv'])) . '</td></tr>';
+			$header_tbl.='<tr><th>tag</th><td>' . he(bin2hex($info['tag'])) . '</td></tr>';
+			$header_tbl.='<tr><th>salt</th><td>' . he(bin2hex($info['salt'])) . '</td></tr>';
+			$header_tbl.='<tr><th>hash</th><td>' . he(bin2hex($info['hmac'])) . '</td></tr>';
 			$header_tbl.='<tr><th>rounds</th><td>' . he($info['rounds']) . '</td></tr>';
 			$header_tbl.='</table>';
 		}
@@ -314,7 +323,9 @@
 		$header['rounds']=CRYPTO_ROUNDS;
 		$header['iv']=enc_random(openssl_cipher_iv_length($mode));
 		$header['key']=enc_kdf($password,$header['salt'],enc_get_keysize($mode),$header['rounds']);
-		$data=openssl_encrypt(file_get_contents($in),$mode,$header['key'],OPENSSL_RAW_DATA,$header['iv'],$header['tag']);
+		$file=file_get_contents($in);
+		$header['hmac']=hash_hmac(CRYPTO_HMAC,$file,$header['key'],TRUE);
+		$data=openssl_encrypt($file,$mode,$header['key'],OPENSSL_RAW_DATA,$header['iv'],$header['tag']);
 		if($data===FALSE){
 			return openssl_error_string();
 		}
@@ -343,6 +354,9 @@
 				is_string($str) && strlen($str)>0?
 				$str:
 				'Openssl failed without giving a reason. Likely wrong password.';
+		}
+		if($header['hmac']!==hash_hmac(CRYPTO_HMAC,$data,$header['key'],TRUE)){
+			return 'File verification failed. Cryptographic data damaged od tampered.';
 		}
 		$count=@file_put_contents($out,$data);
 		return $count>0?TRUE:'Unable to write to ' . $out;
