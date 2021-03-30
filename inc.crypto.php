@@ -134,7 +134,7 @@
 			if(strlen($post['password1'])===0 || $post['password1']!==$post['password2']){
 				$err='Passwords do not match';
 			}
-			if(!in_array($post['algo'],$ciphers,TRUE)){
+			if(!in_array($post['algo'],$ciphers['all'],TRUE)){
 				$err='Unknown cipher';
 			}
 			if(strlen($post['output'])===0){
@@ -164,7 +164,7 @@
 			if(strlen($post['password1'])===0){
 				$err='Password is required';
 			}
-			if(!in_array($post['algo'],$ciphers,TRUE)){
+			if(!in_array($post['algo'],$ciphers['all'],TRUE)){
 				$err='Unknown cipher';
 			}
 			if(strlen($post['output'])===0){
@@ -198,13 +198,29 @@
 		else{
 		$select='<select name="algo" required><option value="">-- Please select --</option>' .
 			'<option value="' . he(CRYPTO_DEFAULT) .  '">Recommended (' . he(CRYPTO_DEFAULT) .  ')</option>';
-			foreach($ciphers as $c){
-				if($c===$algo){
-					$select.='<option selected>' . he($c) . '</option>';
+			if(count($ciphers['safe'])>0){
+				$select.='<optgroup label="Safe ciphers">';
+				foreach($ciphers['safe'] as $c){
+					if($c===$algo){
+						$select.='<option selected>' . he($c) . '</option>';
+					}
+					else{
+						$select.='<option>' . he($c) . '</option>';
+					}
 				}
-				else{
-					$select.='<option>' . he($c) . '</option>';
+				$select.='</optgroup>';
+			}
+			if(count($ciphers['unsafe'])>0){
+				$select.='<optgroup label="Unsafe ciphers">';
+				foreach($ciphers['unsafe'] as $c){
+					if($c===$algo){
+						$select.='<option selected value="' . he($c) . '">' . he($c) . ' (unsafe)</option>';
+					}
+					else{
+						$select.='<option value="' . he($c) . '">' . he($c) . ' (unsafe)</option>';
+					}
 				}
+				$select.='</optgroup>';
 			}
 			$select.='</select>';
 		}
@@ -251,17 +267,33 @@
 	//Gets all ciphers that are considered secure
 	function enc_get_ciphers(){
 		$enc=openssl_get_cipher_methods();
+		$algo=array('safe'=>array(),'unsafe'=>array());
+		$allow_unsafe=av(getConfig(),'unsafe-crypto',FALSE)===TRUE;
 		$c=count($enc);
 		for($i=0;$i<$c;$i++){
 			for($j=0;$j<count(CRYPTO_UNSAFE);$j++){
 				if(preg_match(CRYPTO_UNSAFE[$j],$enc[$i])){
-					unset($enc[$i]);
-					break;
+					if($allow_unsafe){
+						$algo['unsafe'][]=$enc[$i];
+					}
+					else{
+						unset($enc[$i]);
+						break;
+					}
 				}
 			}
 		}
-		//Re-key array to remove deleted indexes
-		return array_values($enc);
+		//Add all unprocessed algorithms to the safe list
+		foreach($enc as $alg){
+			if(!in_array($alg,$algo['unsafe'])){
+				$algo['safe'][]=$alg;
+			}
+		}
+		$algo['all']=array_merge($algo['safe'],$algo['unsafe']);
+		sort($algo['all']);
+		sort($algo['safe']);
+		sort($algo['unsafe']);
+		return $algo;
 	}
 	
 	//Gets the key size from an algorithm
