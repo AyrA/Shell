@@ -42,7 +42,9 @@
 				$result=run($cmd);
 			}
 			if(is_array($result)){
-				$buffer.='<div>'. he($cmd) .'</div>';
+				$buffer.='<p>' . he($cmd) .
+				' <a href="#" id="cmdcopylink" data-command="' . he($cmd) . '">re-use</a>' .
+				'</p>';
 				if(strlen($result['stdout'])>0 && strlen($result['stderr'])>0){
 					$buffer.='<div class="cmd">
 					<p>STDOUT</p>
