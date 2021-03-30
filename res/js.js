@@ -1,4 +1,8 @@
 (function ($, $$) {
+    console.time("INIT");
+    console.time("READY");
+    console.time("LOAD");
+
     var IMG_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA" +
         "AABAAAAAQCAIAAACQkWg2AAAAJ0lEQVR42mOcOXMmAzZw9uxZrOKM" +
         "oxpooiEtLQ2rhLGx8agG+mkAACpiL/lWCxuBAAAAAElFTkSuQmCC";
@@ -18,9 +22,9 @@
             hideTabs();
             tab.style.display = "block";
             header.classList.add("active");
-        } else {
-            console.log("no tab with id", id);
+            return true;
         }
+        return false;
     };
     var addTab = function (e) {
         var tb = this;
@@ -74,6 +78,15 @@
         });
     });
 
+    $$("#cmdcopylink").forEach(function (v) {
+        v.addEventListener("click", function (e) {
+            var target = $("input[name=cmd]");
+            e.preventDefault();
+            target.value = this.getAttribute("data-command") || "";
+            target.focus();
+        });
+    });
+
     $$("img[data-original]").forEach(function (v) {
         v.addEventListener("load", function () {
             this.removeAttribute("loading");
@@ -88,5 +101,11 @@
         tb.addEventListener("keydown", addTab);
     });
 
-    console.log("Ready");
+    document.addEventListener("DOMContentLoaded", function () {
+        console.timeEnd("READY");
+    });
+    window.addEventListener("load", function () {
+        console.timeEnd("LOAD");
+    });
+    console.timeEnd("INIT");
 })(document.querySelector.bind(document), document.querySelectorAll.bind(document))
