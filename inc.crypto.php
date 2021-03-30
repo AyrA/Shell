@@ -32,7 +32,7 @@
 			fwrite($fp,chr(($num>>$i*8)&0xFF));
 		}
 	}
-	
+
 	//Get empty header
 	function enc_get_header(){
 		return array(
@@ -45,7 +45,7 @@
 			'tag'=>NULL
 		);
 	}
-	
+
 	//Writes length prefixed byte to a file stream
 	function enc_write_prefixed_bytes($fp,$data,$size){
 		$len=strlen($data);
@@ -57,7 +57,7 @@
 			enc_write_int($fp,0,$size);
 		}
 	}
-	
+
 	//Reads length prefixed byte to a file stream
 	function enc_read_prefixed_bytes($fp,$size){
 		$len=enc_read_int($fp,$size);
@@ -66,7 +66,7 @@
 		}
 		return '';
 	}
-	
+
 	//Writes header to a file
 	function enc_write_header($path,$header,$data){
 		if($fp=@fopen($path,'wb')){
@@ -82,7 +82,7 @@
 		}
 		return 'Unable to open ' . $path;
 	}
-	
+
 	//Get header of encrypted file
 	function enc_get_info($path,$keep_data=FALSE){
 		$header=enc_get_header();
@@ -123,12 +123,12 @@
 
 		$info=enc_get_info($path);
 		$ciphers=enc_get_ciphers();
-		
+
 		$post=array();
 		foreach(array('password2','password1','output','algo','mode') as $m){
 			$post[$m]=av($_POST,$m);
 		}
-		
+
 		//encrypt post request
 		if($post['mode']==='encrypt'){
 			if(strlen($post['password1'])===0 || $post['password1']!==$post['password2']){
@@ -158,7 +158,7 @@
 				}
 			}
 		}
-		
+
 		//decrypt post request
 		if($post['mode']==='decrypt'){
 			if(strlen($post['password1'])===0){
@@ -188,7 +188,7 @@
 				}
 			}
 		}
-		
+
 		$encrypted=$info!==FALSE;
 		$algo=isset($info['mode'])?$info['mode']:CRYPTO_DEFAULT;
 		if($encrypted){
@@ -198,7 +198,8 @@
 		else{
 		$select='<select name="algo" required><option value="">-- Please select --</option>' .
 			'<option value="' . he(CRYPTO_DEFAULT) .  '">Recommended (' . he(CRYPTO_DEFAULT) .  ')</option>';
-			if(count($ciphers['safe'])>0){
+			//Don't show the optgroup for safe ciphers if no unsafe ciphers are available at all
+			if(count($ciphers['safe'])>0 && count($ciphers['unsafe'])>0){
 				$select.='<optgroup label="Safe ciphers">';
 				foreach($ciphers['safe'] as $c){
 					if($c===$algo){
@@ -210,6 +211,7 @@
 				}
 				$select.='</optgroup>';
 			}
+			//Unsafe ciphers are always below the safe ones
 			if(count($ciphers['unsafe'])>0){
 				$select.='<optgroup label="Unsafe ciphers">';
 				foreach($ciphers['unsafe'] as $c){
@@ -240,8 +242,8 @@
 			$header_tbl.='<tr><th>Size</th><td>' . formatSize(filesize($path)) . '</td></tr>';
 			$header_tbl.='</table>';
 		}
-		
-		
+
+
 		$buffer=
 			homeForm() .
 			($err?'<h1 class="err">' . he($err) . '</h1>':'') .
@@ -295,7 +297,7 @@
 		sort($algo['unsafe']);
 		return $algo;
 	}
-	
+
 	//Gets the key size from an algorithm
 	function enc_get_keysize($algo){
 		if(preg_match('#^\w+-(\d+)#',$algo,$m)){
@@ -345,11 +347,11 @@
 		$count=@file_put_contents($out,$data);
 		return $count>0?TRUE:'Unable to write to ' . $out;
 	}
-	
+
 	function enc_random($count){
 		return openssl_random_pseudo_bytes($count);
 	}
-	
+
 	function enc_kdf($password,$salt,$length,$rounds=CRYPTO_ROUNDS){
 		return openssl_pbkdf2($password,$salt,$length,$rounds,'sha1');
 	}
