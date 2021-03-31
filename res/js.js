@@ -97,8 +97,29 @@
         });
     });
 
+    //Allow tab as input character in text box
     $$(".accept-tab").forEach(function (tb) {
         tb.addEventListener("keydown", addTab);
+    });
+
+    //Theme preview function
+    $$("#themebox").forEach(function (sel) {
+        sel.addEventListener("change", function (e) {
+            var theme = this.value;
+            var style = $("#themeCSS");
+            if (theme && theme.length > 0) {
+                if (!style) {
+                    style = document.createElement("link");
+                    style.setAttribute("id", "themeCSS");
+                    style.setAttribute("rel", "stylesheet");
+                    style.setAttribute("type", "text/css");
+                    $("head").appendChild(style);
+                }
+                style.setAttribute("href", "res/theme." + theme + ".css");
+            } else if (style) {
+                style.remove();
+            }
+        });
     });
 
     document.addEventListener("DOMContentLoaded", function () {

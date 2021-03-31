@@ -1,0 +1,40 @@
+/*{
+	"name":"Basic",
+	"desc":"Basic formatting"
+}*/
+body{
+	font-family:Sans-Serif;
+}
+.hex{
+	font-family:monospace;
+}
+.zip-file{
+	color:#090;
+	font-weight:bold;
+}
+.zip-dir{
+	color:#F0F;
+}
+.ini-header{
+	color:#F0F;
+}
+.ini-invalid{
+	color:#F00;
+	font-weight:bold;
+}
+.ini-name{
+	color:#090;
+}
+.ini-value{
+	color:#00F;
+}
+.ini-empty{
+	color:#333;
+}
+.ini-comment{
+	color:#0FF;
+	font-size:small;
+}
+.hex{
+	border:2px solid #000;
+}

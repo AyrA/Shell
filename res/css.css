@@ -1,26 +1,24 @@
+/*
+	Basic CSS file. Always loaded before any theme.
+	Only applies the most minimal styles and will make the page look almost unstyled
+*/
 *{
-	font-family:Consolas,Lucida Console,monospace;
+	box-sizing:border-box;
 }
 small{
 	font-size:8pt;
 }
 body{
-	background-color:#000;
-	color:#FFF;
 	font-size:12pt;
 }
 form{
 	margin:1em;
 }
 input,textarea,select,.btn{
-	color:#FF0;
-	background-color:#000;
-	border:2px solid #0F0;
-	margin:0.25em;
 	font-size:12pt;
 }
-code{
-	color:#FF0;
+a{
+	color:#00F;
 }
 audio{
 	width:60em;
@@ -33,18 +31,15 @@ table{
 	border-collapse:collapse;
 }
 td{
-	border:1px solid #888;
+	border:1px solid #000;
 	padding:0.25em;
 }
-
 th{
-	border:2px solid #888;
+	border:2px solid #000;
 	padding:0.25em;
-}
-a{
-	color:#FF0;
 }
 img{
+	/*This is the checkerboard pattern some image editors show to indicate transparency*/
 	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAJ0lEQVR42mOcOXMmAzZw9uxZrOKMoxpooiEtLQ2rhLGx8agG+mkAACpiL/lWCxuBAAAAAElFTkSuQmCC);
 }
 
@@ -52,35 +47,8 @@ img{
 	margin-top:1em;
 	margin-bottom:1em;
 }
-
-.zip-file{
-	color:#FF0;
-}
-.zip-dir{
-	color:#F0F;
-}
-
-.ini-header{
-	color:#F0F;
-}
-.ini-invalid{
-	color:#F00;
-}
-.ini-name{
-	color:#0F0;
-}
-.ini-value{
-	color:#FF0;
-}
-.ini-empty{
-	color:#AAA;
-}
-.ini-comment{
-	color:#0FF;
-	font-size:small;
-}
 .row-2,.cmd{
-	width:49%;
+	width:50%;
 	margin:0;
 	padding:0;
 	display:inline-block;
@@ -90,7 +58,6 @@ img{
 }
 .hex{
 	padding:1em;
-	border:2px solid #0F0;
 	display:inline-block;
 	max-height:25em;
 	overflow-y:scroll;
@@ -102,12 +69,12 @@ img{
 	display:inline-block;
 	margin-right:1em;
 	padding:0.25em;
-	border:1px solid #0F0;
+	border:1px solid #000;
 	font-weight:bold;
 	cursor:pointer;
 }
 .tab-header > div.active{
-	background-color:#FFF;
+	background-color:#FF0;
 	color:#000;
 }
 .tab-content> div{
@@ -118,7 +85,7 @@ img{
 	text-decoration:none;
 }
 .ok{
-	color:#0F0;
+	color:#090;
 }
 .err{
 	color:#F00;
@@ -130,11 +97,12 @@ img{
 }
 .progress{
 	width:200px;
-	border:1px solid #FFF;
+	border:1px solid #000;
 	display:inline-block;
 }
 .progress > div{
-	background-color:#090;
+	background-color:#00F;
+	color:#090;
 }
 
 .alert{
@@ -152,7 +120,7 @@ img{
 	/**/
 }
 .table-dir{
-	background-color:#222;
+	background-color:#EEE;
 }
 .thumb{
 	display:flex;
@@ -162,7 +130,7 @@ img{
 	word-wrap:break-word;
 	width:200px;
 	min-height:200px;
-	background-color:#333;
+	background-color:#EEE;
 	padding:0.25em;
 	margin:0.25em;
 }
@@ -187,6 +155,7 @@ img{
 :invalid{
 	border-color:#F00;
 }
+/*The CSP policy doesn't allows for inline "style" attributes, so all percentages are listed below*/
 .width-0{width:0%}.width-1{width:1%}.width-2{width:2%}.width-3{width:3%}.width-4{width:4%}
 .width-5{width:5%}.width-6{width:6%}.width-7{width:7%}.width-8{width:8%}.width-9{width:9%}
 .width-10{width:10%}.width-11{width:11%}.width-12{width:12%}.width-13{width:13%}.width-14{width:14%}

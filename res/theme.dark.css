@@ -1,0 +1,77 @@
+/*{
+	"name":"Dark",
+	"desc":"Dark theme in \"cinema hacker screen\" look"
+}*/
+*{
+	font-family:Consolas,Lucida Console,monospace;
+}
+body{
+	background-color:#000;
+	color:#FFF;
+}
+input,textarea,select,.btn{
+	color:#FF0;
+	background-color:#000;
+	border:2px solid #0F0;
+	margin:0.25em;
+}
+code{
+	color:#FF0;
+}
+td,th{
+	border-color:#888;
+}
+a{
+	color:#FF0;
+}
+.zip-file{
+	color:#FF0;
+}
+.zip-dir{
+	color:#F0F;
+}
+.ini-header{
+	color:#F0F;
+}
+.ini-invalid{
+	color:#F00;
+}
+.ini-name{
+	color:#0F0;
+}
+.ini-value{
+	color:#FF0;
+}
+.ini-empty{
+	color:#AAA;
+}
+.ini-comment{
+	color:#0FF;
+	font-size:small;
+}
+.hex{
+	border:2px solid #0F0;
+}
+.tab-header > div{
+	border-color:#0F0;
+}
+.tab-header > div.active{
+	background-color:#FFF;
+	color:#000;
+}
+.ok{
+	color:#0F0;
+}
+.progress{
+	border-color:#FFF;
+}
+.progress > div{
+	background-color:#090;
+}
+.table-dir{
+	background-color:#222;
+}
+.thumb > div{
+	background-color:#333;
+}
+

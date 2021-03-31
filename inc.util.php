@@ -37,6 +37,8 @@
 	$resources=array();
 	//Config cache
 	$_config=NULL;
+	//Theme cache
+	$_themes=NULL;
 
 	//Dumps an object to the page
 	function dump($obj,&$dumped=NULL){
@@ -450,6 +452,41 @@
 	//Resets the configuration to the initial state
 	function resetConfig(){
 		return setConfig(NULL);
+	}
+	
+	//Gets all themes
+	function getThemes(){
+		global $_themes;
+		if(is_array($_themes)){
+			return $_themes;
+		}
+		$themes=array(''=>array(
+			//This is the name of the theme as set in the header
+			'name'=>'None',
+			//This is the description of the theme as set in the header
+			'desc'=>'no theme. Very basic look',
+			//Indicates whether this theme has a supporting JS file or not.
+			'js'=>FALSE
+		));
+		foreach(glob('res/theme.*.css') as $file){
+			preg_match('#theme\.(.+)\.css$#i',$file,$m);
+			$filename=$m[1];
+			if(preg_match('#/\\*(.+?)\\*/#s',file_get_contents($file),$m)){
+				$data=json_decode(trim($m[1]),TRUE);
+				if(is_array($data) && av($data,'name') && av($data,'desc')){
+					$themes[$filename]=array(
+						'file'=>$filename,
+						'name'=>$data['name'],
+						'desc'=>$data['desc'],
+						'js'=>is_file("res/theme.$filename.js")
+					);
+				}
+			}
+			else{
+				die('Theme' . $filename . ' does not contains a header');
+			}
+		}
+		return $_themes=$themes;
 	}
 
 	//Obtains the script URL (without host name and protocol)
