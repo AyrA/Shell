@@ -18,6 +18,7 @@
 	}
 
 	//Allow access from other resources
+	//Usually you don't want this, but we may add some form of API at some point
 	//setHeader('Access-Control-Allow-Origin','*');
 	csp();
 
