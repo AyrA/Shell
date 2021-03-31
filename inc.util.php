@@ -563,6 +563,12 @@
 	}
 
 	if(!defined('CONFIG_FILE')){
+		header('HTTP/1.1 503 Service Unavailable');
 		setHeader('Content-Type','text/plain');
-		fail('CONFIG_FILE is not set');
+		die('The server can\'t handle your request at this time. "CONFIG_FILE" is not set in shell.php');
+	}
+	if(!is_file('LICENSE')){
+		header('HTTP/1.1 503 Service Unavailable');
+		setHeader('Content-Type','text/plain');
+		die('The server can\'t handle your request at this time. License file "LICENSE" was not found. Please re-download from https://github.com/AyrA/Shell');
 	}
