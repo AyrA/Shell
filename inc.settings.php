@@ -21,6 +21,7 @@
 			}
 		}
 		if(av($_POST,'mode')==='settings'){
+			$config['allowbots']=av($_POST,'allowbots')==='1';
 			$config['skipcount']=av($_POST,'skipcount')==='1';
 			$config['norecursion']=av($_POST,'norecursion')==='1';
 			$config['stdoutonly']=av($_POST,'stdoutonly')==='1';
@@ -123,8 +124,10 @@
 					<label><input type="checkbox" name="stdoutonly" value="1" ' . (av($config,'stdoutonly')?'checked':'') . '/> Ignore error and input streams in shell commands</label><br />
 					<small>
 						Only uses stdout. Causes programs that wait for input to hang indefinitely.
-						Useful for commands that write a lot to stderr.
+						Useful for commands that write a lot to stderr
 					</small><br />
+					<label><input type="checkbox" name="allowbots" value="1" ' . (av($config,'allowbots')?'checked':'') . '/> Allow robot access</label><br />
+					<small>Allows access by automated tools and known bots</small><br />
 					Theme: <select name="theme" id="themebox">';
 					foreach(getThemes() as $themename=>$theme){
 						$buffer.='<option value="' . he($themename) .
@@ -150,7 +153,7 @@
 					<textarea name="aliases" rows="10" class="max">' . he($aliases) . '</textarea><br />
 					<input type="submit" value="set" />
 				</form>
-			</div>';
+			</div><pre>' . he(file_get_contents('LICENSE')) . '</pre>';
 		if($err){
 			$buffer='<div class="err">' . nl2br(he($err)) . '</div>' . $buffer;
 		}
