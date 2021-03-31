@@ -118,7 +118,7 @@
 		$buffer='';
 		//These two lines allow the shell to "cut corners" if it takes a long time
 		$cutoff=time()+15;
-		$skipcount=$config['skipcount'];
+		$skipcount=av($config,'skipcount')===TRUE;
 
 		$shortcut=FALSE;
 		$rows=array('file'=>array(),'dir'=>array(NULL),'invalid'=>array());
