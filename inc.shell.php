@@ -91,7 +91,8 @@
 		}
 		//Drive list
 		$buffer.='<form method="get" action="' . selfurl() . '">
-		<input type="hidden" name="action" value="shell" />';
+		<input type="hidden" name="action" value="shell" />
+		<input type="hidden" name="view" value="'.he($view).'" />';
 		foreach($drives as $x){
 			//Get volume label
 			$label=stripnl(av(run('vol ' . substr($x,0,2)),'stdout','Unknown volume label'));
