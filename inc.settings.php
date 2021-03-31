@@ -153,7 +153,7 @@
 					<textarea name="aliases" rows="10" class="max">' . he($aliases) . '</textarea><br />
 					<input type="submit" value="set" />
 				</form>
-			</div><pre>' . he(file_get_contents('LICENSE')) . '</pre>';
+			</div><pre class="license">' . he(file_get_contents('LICENSE')) . '</pre>';
 		if($err){
 			$buffer='<div class="err">' . nl2br(he($err)) . '</div>' . $buffer;
 		}
