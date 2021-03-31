@@ -125,7 +125,7 @@
 						Only uses stdout. Causes programs that wait for input to hang indefinitely.
 						Useful for commands that write a lot to stderr.
 					</small><br />
-					<select name="theme" id="themebox">';
+					Theme: <select name="theme" id="themebox">';
 					foreach(getThemes() as $themename=>$theme){
 						$buffer.='<option value="' . he($themename) .
 							'" ' . ($themename===av($config,'theme')?'selected':'') . '>' .
