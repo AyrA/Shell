@@ -186,7 +186,7 @@
 							}
 							else{
 								//Special case for empty value
-								$buffer.='<span class="ini-empty">(No value)</span>';
+								$buffer.='<span class="ini-empty">(No value)</span><br />';
 							}
 						}
 					}
