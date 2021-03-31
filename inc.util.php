@@ -436,7 +436,7 @@
 		return array(
 			'password'=>NULL,
 			'salt'=>bin2hex(openssl_random_pseudo_bytes(20)),
-			'theme'=>is_array(getThemes(),'dark')?'dark':NULL);
+			'theme'=>is_array(av(getThemes(),'dark'))?'dark':NULL);
 	}
 
 	//Saves the given configuration
