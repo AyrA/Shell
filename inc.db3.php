@@ -1,4 +1,7 @@
 <?php
+	/*
+		SQLite handling
+	*/
 	define('DB3_ROWCOUNT',1000);
 	define('MIME_DB3','application/x-sqlite3');
 
