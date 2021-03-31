@@ -112,7 +112,10 @@
 				if(av(getConfig(),'ini-strip-comments',FALSE)){
 					$tabs['INI'].='<p><small>Your settings cause comments and empty lines to not show</small></p>';
 				}
-				$tabs['INI'].=html_ini_format($lines,av(getConfig(),'ini-strip-comments',FALSE));
+				$tabs['INI'].=
+					'<pre class="ini">' .
+					html_ini_format($lines,av(getConfig(),'ini-strip-comments',FALSE)) .
+					'</pre>';
 			}else{
 				//ini file is not readable by a PHP script
 				$tabs['INI'].='<p class="err">Unable to read the file</p>';
@@ -156,7 +159,7 @@
 	function html_ini_format($lines,$strip_comments){
 		$buffer='';
 		foreach($lines as $line){
-			if(strlen(trim($line))>0)
+			if(strlen($line=trim($line))>0)
 			{
 				//Skip comments
 				if(!preg_match('#\s*;#',$line)){
@@ -182,13 +185,13 @@
 							}
 							else{
 								//Special case for empty value
-								$buffer.='<i class="ini-empty">(No value)</i><br />';
+								$buffer.='<span class="ini-empty">(No value)</span>';
 							}
 						}
 					}
 				}
 				elseif($strip_comments!==TRUE){
-					$buffer.='<i class="ini-comment">' . he($line) . '</i><br />';
+					$buffer.='<span class="ini-comment">' . he($line) . '</span><br />';
 				}
 			}
 		}
