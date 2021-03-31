@@ -15,6 +15,24 @@
 	//MIME type for a GZ file
 	define('MIME_GZ','application/gzip');
 	define('MIME_ZIP','application/zip');
+	
+	//User agents to be blocked.
+	//By default, the shell will not allow access if the user agent matches one of these.
+	//The values need to be a valid regex.
+	//It will be used in the format (a|b|c|d|e|f|...) by joining with '|'
+	//It's treated case insensitive
+	define('ROBOT_UA',array(
+		'petalbot','barkrowler','intelx\.io','gdnplus',
+		'screaming\ frog','alphabot','netestate',
+		'adsbot','scanner','surdotlybot','datanyze','netpeakchecker',
+		'ahrefsbot','MJ12bot','mediatoolkitbot','semrushbot','spbot','aspiegel',
+		'facebot','snapchat','discord','google','bingbot',
+		'msnbot','yandex','qwantify','seznam','facebook',
+		'ltx71','megaindex','netcraftsurvey','awariosmartbot',
+		'censysinspect','zgrab','rogerbot','dotbot','blexbot','ezooms','sistrix',
+		'twitter','curl','wget','seo','node\-fetch',
+		'python\-requests','Python\-urllib',
+		'go\-http\-client'));
 
 	$resources=array();
 	//Config cache
@@ -102,7 +120,7 @@
 	//Detects common bots and tools
 	function isRobot(){
 		$ua=av($_SERVER,'HTTP_USER_AGENT','');
-		return $ua==='' || preg_match('#(googlebot|bingbot|msnbot|yandex|qwantify|seznam|facebook|twitter|curl|wget|seo)#i',$ua);
+		return $ua==='' || preg_match('#(' . implode('|',ROBOT_UA) . ')#i',$ua);
 	}
 
 	//Checks if the given directory is empty
