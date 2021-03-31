@@ -567,7 +567,8 @@
 		setHeader('Content-Type','text/plain');
 		die('The server can\'t handle your request at this time. "CONFIG_FILE" is not set in shell.php');
 	}
-	if(!is_file('LICENSE') || sha1_file('LICENSE')!=='cd6fc525581eba4e9b8e594b6bc89d3ff68b226d'){
+	//The two hashes are to deal with CRLF vs LF only line termination
+	if(!is_file('LICENSE') || !in_array(sha1_file('LICENSE'),array('fd50f1fa9f75f9f89146c08730a76c43c2e95e95','cd6fc525581eba4e9b8e594b6bc89d3ff68b226d'))){
 		header('HTTP/1.1 503 Service Unavailable');
 		setHeader('Content-Type','text/plain');
 		die('The server can\'t handle your request at this time. License file "LICENSE" was not found or is corrupt. Please re-download the shell from https://github.com/AyrA/Shell');
