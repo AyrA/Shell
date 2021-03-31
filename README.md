@@ -17,7 +17,7 @@ This shell will not try to work its way around any restrictions put in place by 
 Quick overview of the features.
 Details are in the chapters below
 
-- General: Cinematic dark mode hacker look (aka. green monospace font on black background)
+- General: Support for themes including cinematic dark mode hacker look (aka. white/yellow/green monospace font on black background)
 - General: Minimal JS usage
 - General: Settings for customizations and performance
 - General: Read basic server and PHP configuration
@@ -438,6 +438,42 @@ It also makes PHP ignore the stdin stream, meaning a program that prompts for in
 
 Check the "Terminal / Input" chapter to see what this means.
 
+##### Theme
+
+You can select a custom theme here.
+Your selection will be immediately shown as a preview if you have JS enabled.
+A few themes are provided by default:
+
+- None: This only uses the basic css file. As fast as it is ugly
+- Basic: The "None" theme with a handful of nice formatting added, for example colorized PHP ini output.
+- Dark: Dark theme with monospace font. Looks a bit like a movie prop.
+
+You can add custom themes as follows:
+
+1. Add a file `theme.xyz.css` into the "res" folder and add style rules to it
+2. Add a JSON header comment in the form `/*{"name":"...","desc":"..."}*/`
+3. (Optional) Add a file `theme.xyz.js` to the "res" folder with custom JS code.
+4. Select the theme in the settings and save
+
+The basic CSS and JS files are always loaded.
+The theme is loaded directly after.
+
+The JSON comment may be formatted for better readability (see existing themes).
+The comment must contain the fields "name" and "desc" otherwise the theme will be ignored.
+The header may contain other fields if you want them, but the shell will ignore them.
+The "name" should be very short, and the "desc" should further explain your theme.
+
+You can't make a theme that is a JS file only. If you want to make a JS only theme,
+you must add an empty CSS file with the header comment.
+
+Placement of the header comment is quite permissive.
+It must be the first comment but not necessarily the first content of the file.
+
+Pull requests for more themes are welcome,
+but be aware that the theme is only included
+if you license it under the MIT license,
+or a license that is more permissive (such as the WTFPL)
+
 #### Aliases
 
 You can define aliases, one per line.
@@ -456,7 +492,7 @@ Most browsers also display a drop down if you click into the command line field 
 ## Installation
 
 Drop all files into a directory on your web server, then access `shell.php` to get started.
-You will be asked to set your password.
+You will be asked to set your password and accept the license.
 
 You can either download the current release from https://github.com/AyrA/Shell/archive/refs/heads/master.zip
 or do a `git clone https://github.com/AyrA/Shell.git`.
