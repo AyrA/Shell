@@ -23,11 +23,11 @@
 
 	$auth=isAuth();
 	//Show password configuration form if no configuration is present
-	if(av($config,'password')===NULL){
+	if(!$auth && av($config,'password')===NULL){
 		handlePassword();
 	}
 	//Check if it's a login attempt
-	if(av($_POST,'password'))
+	if(!$auth && av($_POST,'password'))
 	{
 		//Ensure a single IP can't brute-force the password
 		//If the IP can't be obtained, time() allows one attempt from anywhere each second.
