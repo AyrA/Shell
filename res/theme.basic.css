@@ -23,17 +23,19 @@ body{
 	font-weight:bold;
 }
 .ini-name{
-	color:#090;
+	color:#0AA;
 }
 .ini-value{
 	color:#00F;
 }
 .ini-empty{
 	color:#333;
+	font-style:italic;
 }
 .ini-comment{
-	color:#0FF;
+	color:#090;
 	font-size:small;
+	font-style:italic;
 }
 .hex{
 	border:2px solid #000;
