@@ -151,6 +151,7 @@
 		}
 		$tabs['Other'].='<tr><td>DNS working</td><td>' . he($dns) . '</td><td>Tried by resolving one.one.one.one</td></tr>';
 		$tabs['Other'].='</tbody></table>';
+		$tabs['License']='<pre class="license">' . he(file_get_contents('LICENSE')) . '</pre>';
 		$tabs['Config']='<h1>Configuration from ' . he(CONFIG_FILE) . '</h1>';
 		$tabs['Config'].=dump(getconfig()) . '<p><a href="' .  selfurl() . '?action=settings">Edit</a></p>';
 		showTabs($tabs,homeForm());
@@ -210,7 +211,8 @@
 		if(!empty($_POST)){
 			$pw1=av($_POST,'pw1');
 			$pw2=av($_POST,'pw2');
-			if($pw1 && $pw2 && $pw1===$pw2){
+			$lic=av($_POST,'license')==='1';
+			if($lic && $pw1 && $pw2 && $pw1===$pw2){
 				$config=getConfig();
 				$config['password']=password_hash($pw1,PASSWORD_DEFAULT);
 				$config['salt']=bin2hex(openssl_random_pseudo_bytes(20));
@@ -219,9 +221,14 @@
 			}
 		}
 		exit(html('<h1>Set a password</h1><form method="post" action="' . selfurl() . '">
-		<input type="password" name="pw1" placeholder="password" />
-		<input type="password" name="pw2" placeholder="password" />
-		<input type="submit" value="Set password" /></form>'));
+		Password: <input type="password" name="pw1" placeholder="Password" required minlength="8" /><br />
+		Password: <input type="password" name="pw2" placeholder="Password (repeat)" required minlength="8" /><br />
+		<pre class="license">' . he(file_get_contents('LICENSE')) . '</pre>
+		<label>
+			<input type="checkbox" name="license" value="1" required />
+			Accept the MIT license
+		</label><br />
+		<input type="submit" value="Save" /></form>'));
 	}
 
 	//Shows the login form
