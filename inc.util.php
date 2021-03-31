@@ -432,7 +432,11 @@
 				return $_config=$line;
 			}
 		}
-		return array('password'=>NULL,'salt'=>bin2hex(openssl_random_pseudo_bytes(20)));
+		//No configuration found. Return default configuration.
+		return array(
+			'password'=>NULL,
+			'salt'=>bin2hex(openssl_random_pseudo_bytes(20)),
+			'theme'=>is_array(getThemes(),'dark')?'dark':NULL);
 	}
 
 	//Saves the given configuration
