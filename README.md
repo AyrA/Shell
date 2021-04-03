@@ -507,6 +507,8 @@ in the directory the shell is in.
 This means you need to grant the web server write permissions into the shell directory.
 If you don't want that, change the `CONFIG_FILE` constant in `shell.php` to a different path.
 
+**Always use an absolute path because some pages may change the working directory.**
+
 Note: The config file is not actually a PHP file.
 The shell just abuses the php file to hide the configuration.
 Ensure to not accidentally expose the configuration to the general public.
