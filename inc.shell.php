@@ -125,8 +125,9 @@
 		sort($list,SORT_FLAG_CASE|SORT_NATURAL);
 		if($list){
 			//Terminal form
-			$buffer.='<form method="get"><input type="hidden" name="action" value="shell" />'.
-				'<input type="text" name="path" value="'.he($path).'" size="80" required />' .
+			$buffer.='<form method="get"><input type="hidden" name="action" value="shell" />' .
+				'<input type="hidden" name="view" value="' . he($view) . '" />' .
+				'<input type="text" name="path" value="' . he($path) . '" size="80" required />' .
 				'<input type="submit" value="Go" />';
 			$buffer.='<a href="' . selfurl() . '?action=terminal&amp;path=' . urlencode($path) . '" class="btn">Open terminal here</a>
 				</form>';
