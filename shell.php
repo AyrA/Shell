@@ -4,7 +4,9 @@
 	*/
 	error_reporting(E_ALL);
 
-	define('CONFIG_FILE','inc.config.php');
+	//Configuration file
+	//Always use an absolute path because some pages may change the working directory
+	define('CONFIG_FILE',__DIR__ . DIRECTORY_SEPARATOR . 'inc.config.php');
 
 	foreach(glob('inc.*.php') as $f){
 		require($f);
