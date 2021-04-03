@@ -52,6 +52,7 @@
 		if(!is_dir($path)){
 			exit(html('<h1 class="err">This feature is only for directories</h1>'));
 		}
+		set_time_limit(0);
 		$size=dirsize($path);
 		$buffer='<h1>Size of ' . he(basename($path)) . '</h1>';
 		$buffer.='<p>Total size: <span title="' . he($size) . ' bytes">' . formatSize($size) . '</span></p>';
