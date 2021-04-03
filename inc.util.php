@@ -472,7 +472,7 @@
 			//Indicates whether this theme has a supporting JS file or not.
 			'js'=>FALSE
 		));
-		foreach(glob('res/theme.*.css') as $file){
+		foreach(glob(__DIR__ . DIRECTORY_SEPARATOR . 'res/theme.*.css') as $file){
 			preg_match('#theme\.(.+)\.css$#i',$file,$m);
 			$filename=$m[1];
 			if(preg_match('#/\\*(.+?)\\*/#s',file_get_contents($file),$m)){
