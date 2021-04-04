@@ -3,6 +3,12 @@
 		HTTP related functions
 	*/
 
+	//File with all known CA certificates
+	define('CAFILE',__DIR__ . DIRECTORY_SEPARATOR . 'ca.pem');
+	//Maximum age of the CA file before a new one is obtained.
+	//CA do not change often. Defaults to 30 days.
+	define('CACACHE',86400*30);
+
 	//Set a header
 	function setHeader($h,$v){
 		header("$h: $v");
@@ -29,7 +35,7 @@
 			sendRange($path);
 		}
 	}
-	
+
 	//Handles caching with the modification date
 	function handleCache($ts){
 		setHeader('Last-Modified',gmdate(HTTP_DATE,$ts));
@@ -110,4 +116,69 @@
 		if($exit){
 			exit(0);
 		}
+	}
+
+	//Gets a curl handle with default options already set
+	function http_curl($url){
+		$ch=curl_init($url);
+		//Fail on HTTP error status codes (400 and greater)
+		curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
+		//Return server response instead of writing to stdout
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
+		//Follow redirect attempts (at most 5)
+		curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
+		curl_setopt($ch,CURLOPT_MAXREDIRS,5);
+		//Maximum 5 second TCP timeout and 5 second response timeout
+		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5);
+		curl_setopt($ch,CURLOPT_TIMEOUT,5);
+		//Custom user agent
+		curl_setopt($ch,CURLOPT_USERAGENT,'AyrA-Shell/' . SHELL_VERSION . ' +https://github.com/AyrA/Shell');
+		//Do certificate validation if the CA file exists
+		if(is_file(CAFILE)){
+			curl_setopt($ch,CURLOPT_CAINFO,CAFILE);
+		}
+		else{
+			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,0);
+		}
+		return $ch;
+	}
+
+	//Tries to obtain a new CA file if it's missing or stale
+	function http_getca(){
+		if(!is_file(CAFILE) || time()-filemtime(CAFILE)>CACACHE)
+		{
+			$ch=http_curl('https://cable.ayra.ch/ca/CA.pem');
+			$ret=curl_exec($ch);
+			//Don't write the file if there was an error or if the response was empty
+			if(curl_errno($ch)===0 && $ret && strlen($ret)>0){
+				file_put_contents(CAFILE,$ret);
+			}
+			curl_close($ch);
+		}
+		return is_file(CAFILE);
+	}
+
+	//Gets a HTTP resource and sends optional headers to it
+	function http_get($url,$headers=NULL){
+		$ret=array('success'=>FALSE,'url'=>$url,'headers'=>$headers);
+
+		$ch=http_curl($url);
+		//Try to obtain a CA list if the URL asks for encryption
+		if(preg_match('#^(http|ftp)s:#i',$url)){
+			$ret['ca']=http_getca();
+		}
+
+		if(is_array($headers)){
+			$parsed_headers=array();
+			foreach($headers as $k=>$v){
+				$parsed_headers[]="$k: $v";
+			}
+			curl_setopt($ch,CURLOPT_HTTPHEADER,$parsed_headers);
+		}
+		$ret['response']=curl_exec($ch);
+		$ret['errno']=curl_errno($ch);
+		$ret['error']=curl_error($ch);
+		$ret['success']=$ret['errno']===0;
+		curl_close($ch);
+		return $ret;
 	}
