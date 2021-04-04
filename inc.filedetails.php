@@ -19,6 +19,7 @@
 
 	//Opens a file for editing and to view properties
 	function openFile(){
+		$config=getConfig();
 		$audio_ext=array('mp3','ogg','wav','flac');
 		$video_ext=array('mp4','webm');
 
@@ -127,7 +128,7 @@
 					else{
 						$buffer.='<div><form method="post"><textarea rows="25" class="max accept-tab" name="content">' . he($data) . '</textarea><br />' .
 						'<input type="submit" value="Save Changes" /><input type="reset" value="Discard Changes" />' .
-						'<label><input type="checkbox" name="keeptime" value="y" checked /> Try to keep modify timestamp</label></form></div>';
+						'<label><input type="checkbox" name="keeptime" value="y" ' . (av($config,'keep-modified')===TRUE?'checked':'') . ' /> Try to keep modify timestamp</label></form></div>';
 					}
 					break;
 				case 'image':

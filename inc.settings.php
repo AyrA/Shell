@@ -28,6 +28,7 @@
 			$config['fastmedia']=av($_POST,'fastmedia')==='1';
 			$config['ini-strip-comments']=av($_POST,'ini-strip-comments')==='1';
 			$config['unsafe-crypto']=av($_POST,'unsafe-crypto')==='1';
+			$config['keep-modified']=av($_POST,'keep-modified')==='1';
 			$theme=av($_POST,'theme');
 			if($theme && is_array(av(getThemes(),$theme))){
 				$config['theme']=$theme;
@@ -111,6 +112,8 @@
 				<h2>Settings</h2>
 				<form method="post" action="' . he(selfurl()) . '?action=settings">
 					<input type="hidden" name="mode" value="settings" />
+					<label><input type="checkbox" name="keep-modified" value="1" ' . (av($config,'keep-modified')?'checked':'') . ' /> Keep modified timestamp of edited files by default</label><br />
+					<small>Enabling this makes the shell check the checkbox for retaining modified time below the text editor by default.</small><br />
 					<label><input type="checkbox" name="unsafe-crypto" value="1" ' . (av($config,'unsafe-crypto')?'checked':'') . ' /> Show unsafe/invalid cryptographic algorithms</label><br />
 					<small>Shows unsafe and non-working algorithms in the file encryption utility</small><br />
 					<label><input type="checkbox" name="ini-strip-comments" value="1" ' . (av($config,'ini-strip-comments')?'checked':'') . ' /> Strip comments in PHP ini</label><br />
