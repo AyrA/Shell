@@ -39,6 +39,13 @@
 			setConfig($config);
 			exit(redir(selfurl() . '?action=settings&msg=Settings+changed'));
 		}
+		if(av($_POST,'mode')==='version'){
+			if(isset($config['version-cache'])){
+				unset($config['version-cache']);
+			}
+			setConfig($config);
+			exit(redir(selfurl() . '?action=settings&msg=Version+cache+cleared'));
+		}
 		if(av($_POST,'mode')==='alias'){
 			$lines=array();
 			$aliases=trim(av($_POST,'aliases',''));
@@ -100,6 +107,7 @@
 				$aliases.="$k=$v\r\n";
 			}
 		}
+		$version_time=av(av($config,'version-cache'),'time',0);
 		$buffer='
 			<div class="row-2">
 				<h2>Change Password</h2>
@@ -156,7 +164,25 @@
 					<textarea name="aliases" rows="10" class="max">' . he($aliases) . '</textarea><br />
 					<input type="submit" value="set" />
 				</form>
-			</div><pre class="license">' . he(file_get_contents('LICENSE')) . '</pre>';
+			</div>';
+			if($version_time>time()-86400){
+				$buffer.='<div>
+					<h2>Version cache</h2>
+					<p>
+						You can clear the version cache to force a re-check of the current version.
+						The cache was created at ' . he(gmdate(USER_DATE,$version_time)) . '.
+					</p>
+					<form method="post">
+						<input type="hidden" name="mode" value="version" />
+						<input type="submit" value="Clear version cache" />
+					</form>
+				</div>';
+			}
+			else{
+				$buffer.='<div><h2>Version check</h2>
+					<a href="' . selfurl() . '">Check for new version</a></div>';
+			}
+			$buffer.='<h2>License</h2><pre class="license">' . he(file_get_contents('LICENSE')) . '</pre>';
 		if($err){
 			$buffer='<div class="err">' . nl2br(he($err)) . '</div>' . $buffer;
 		}
