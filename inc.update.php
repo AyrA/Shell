@@ -14,7 +14,7 @@
 		if(is_array(av($config,'version-cache')) && $config['version-cache']['time']>time()-86400){
 			return $config['version-cache']['data'];
 		}
-		$data=http_get('https://api.github.com/repos/AyrA/Shell/releases',array('Accept'=>'pplication/vnd.github.v3+json'));
+		$data=http_get('https://api.github.com/repos/AyrA/Shell/releases',array('Accept'=>'application/vnd.github.v3+json'));
 		if($data['success']){
 			$tags=json_decode($data['response'],TRUE);
 			if(!is_array($tags)){
