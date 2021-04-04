@@ -147,6 +147,10 @@ img{
 	width:100%;
 	margin-left:0em;
 }
+.update-desc{
+	padding:0.5em;
+	border:1px solid #000;
+}
 
 .action-open img{
 	max-width:100%;

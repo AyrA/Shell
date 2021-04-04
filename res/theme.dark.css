@@ -75,4 +75,6 @@ a{
 .thumb > div{
 	background-color:#333;
 }
-
+.update-desc{
+	border:2px solid #0F0;
+}
