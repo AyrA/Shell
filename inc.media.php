@@ -9,12 +9,12 @@
 	define('THUMB_MODE',IMG_BICUBIC);
 	
 	//Mime types with media contents
-	define('IMAGE_TYPES',array('image/png','image/jpeg','image/gif','image/x-ms-bmp'));
+	define('IMAGE_TYPES',array('image/png','image/jpeg','image/gif','image/x-ms-bmp','image/vnd.microsoft.icon'));
 	define('AUDIO_TYPES',array('audio/mpeg','audio/ogg','audio/x-wav','audio/flac'));
 	define('VIDEO_TYPES',array('video/mp4','video/webm'));
 
 	//File extension regex mask for type detection
-	define('IMAGE_TYPES_FAST','#\.(png|jpe?g|jps|mpo|bmp|gif)(\.(bak|tmp|~))?$#i');
+	define('IMAGE_TYPES_FAST','#\.(ico|png|jpe?g|jps|mpo|bmp|gif)(\.(bak|tmp|~))?$#i');
 	define('AUDIO_TYPES_FAST','#\.(mp3|m4a|aac|ogg|wav|flac)(\.(bak|tmp|~))?$#i');
 	define('VIDEO_TYPES_FAST','#\.(mp4|webm)(\.(bak|tmp|~))?$#i');
 
@@ -58,6 +58,11 @@
 			$type=mime_content_type($path);
 			if(!is_string($type)){
 				$type='application/octet-stream';
+			}
+			//Icons are supported in the browser but not by php
+			if($type==='image/vnd.microsoft.icon'){
+				sendRange($path);
+				return TRUE;
 			}
 			if($img=@imagecreatefromstring(file_get_contents($path))){
 				$w=imagesx($img);
