@@ -21,6 +21,17 @@
 		return preg_replace('#[\r\n]+#',' ',$x);
 	}
 
+	//Generates an external HTML link
+	function extLink($url,$text=NULL){
+		if($text===NULL){
+			$text=$url;
+		}
+		//External links are constructed in a way to not leak the current referer or allow page interaction
+		return
+			'<a href="' . he($url) . '" title="' . he($url) .
+			'" target="_blank" rel="noreferer noopener nofollow">' . he($text) . '</a>';
+	}
+
 	//Renders HTML output
 	function html($x){
 		$footer=array(
@@ -238,15 +249,60 @@
 		<input type="submit" value="Login" /></form>'));
 	}
 
+	//Shows the main menu
+	function showMainMenu(){
+		$buffer='<h1>Secure Shell</h1>';
+		$buffer.=getActions();
+		$buffer.='<p>Current version: ' . SHELL_VERSION . '</p>';
+		$buffer.='<p>' . extLink('https://github.com/AyrA/Shell/blob/master/README.md','Documentation') . '</p>';
+
+		if(TRUE===($ret=update_cancheck())){
+			if(is_array($ret=update_check())){
+				//TODO Check OK
+				$latest=av($ret,'max');
+				if(is_string($latest)){
+					$release=av(av($ret,'versions'),$latest);
+					if($release){
+						$md=new Parsedown();
+						$buffer.='<h2>A newer version is available.</h2><p>
+							<a href="' . selfurl() . '?mode=update">Install ' . he($latest) . '</a></p>
+							<p>
+							Version: ' . he($latest) . '<br />
+							Title: ' . he($release['title']) .'<br />
+							Details: <div class="update-desc">' . $md->text($release['desc']) .'</div>
+							</p>';
+					}
+					else{
+						$buffer.='<p class="err">Version data invalid. Try resetting the version cache in your settings.</p>';
+					}
+				}
+				else{
+					$buffer.='<p>No versions published yet.</p>';
+				}
+			}
+			elseif(is_string($ret)){
+				$buffer.='<p class="err">Version check failed.<br />Reason: ' . he($ret) . '</p>';
+			}
+			else{
+				$buffer.='<p class="err">Version check failed.<br />Unknown reason</p>';
+			}
+		}
+		else{
+			$buffer.='<p class="err">Cannot check for updates.<br />Reason: ';
+			$buffer.=he(is_string($ret)?$ret:'Unknown reason') . '</p>';
+		}
+		exit(html($buffer));
+	}
+
 	//The main menu
-	function showActions(){
-		exit(html('<h1>Select an option</h1><form method="get" action="' . selfurl() . '">
+	function getActions(){
+		return '<h2>Main menu</h2><form method="get" action="' . selfurl() . '">
 		<input type="submit" name="action" value="info" title="PHP information" />
 		<input type="submit" name="action" value="shell" title="Directory browser and file editor" />
 		<input type="submit" name="action" value="terminal" title="Command prompt" />
 		<input type="submit" name="action" value="settings" title="Secure Shell settings" />
 		<input type="submit" name="action" value="exit" title="Logout" />
-		</form>'));
+		</form>';
 	}
 
 	//Creates a link to go back in the browser history

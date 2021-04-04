@@ -100,9 +100,12 @@
 			case 'settings':
 				showSettings();
 				break;
+			case 'update':
+				showUpdate();
+				break;
 			default:
 				//Main menu
-				showActions();
+				showMainMenu();
 				break;
 		}
 	}
