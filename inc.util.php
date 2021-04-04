@@ -3,6 +3,8 @@
 		Contains various utility functions and constants
 	*/
 
+	//Shell version
+	define('SHELL_VERSION','1.0');
 	//Date format for HTTP headers
 	define('HTTP_DATE','D, d M Y H:i:s T');
 	//The date format for whenever a date is being displayed
@@ -49,7 +51,7 @@
 			return he('<null>');
 		}
 		elseif(is_string($obj)){
-			return he($obj);
+			return nl2br(he($obj));
 		}
 		elseif(is_float($obj) || is_int($obj)){
 			return he(number_format($obj,is_int($obj)?0:4,'.','\''));
@@ -211,20 +213,6 @@
 			closedir($dir);
 		}
 		return $ret;
-	}
-
-	//Gets a name that doesn't collides with existing names
-	function freeName($name){
-		if(!file_exists($name)){
-			return $name;
-		}
-		$count=0;
-		$base=$name;
-		$name.='.' . $count;
-		do{
-			$name=$base . '.' . ++$count;
-		}while(file_exists($name));
-		return $name;
 	}
 
 	//Formats a date for user display

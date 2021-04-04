@@ -321,3 +321,17 @@
 		}
 		exit(html($buffer . '<p><a href="' . selfurl() . '?action=shell&amp;path=' . he(dirname($path)) . '">&lt;&lt;Go Back</a></p>'));
 	}
+
+	//Gets a name that doesn't collides with existing names
+	function freeName($name){
+		if(!file_exists($name)){
+			return $name;
+		}
+		$count=0;
+		$base=$name;
+		$name.='.' . $count;
+		do{
+			$name=$base . '.' . ++$count;
+		}while(file_exists($name));
+		return $name;
+	}
