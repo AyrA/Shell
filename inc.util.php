@@ -4,7 +4,7 @@
 	*/
 
 	//Shell version
-	define('SHELL_VERSION','1.0');
+	define('SHELL_VERSION','1.0.0');
 	//Date format for HTTP headers
 	define('HTTP_DATE','D, d M Y H:i:s T');
 	//The date format for whenever a date is being displayed
@@ -17,7 +17,7 @@
 	//MIME type for a GZ file
 	define('MIME_GZ','application/gzip');
 	define('MIME_ZIP','application/zip');
-	
+
 	//User agents to be blocked.
 	//By default, the shell will not allow access if the user agent matches one of these.
 	//The values need to be a valid regex.
@@ -41,6 +41,36 @@
 	$_config=NULL;
 	//Theme cache
 	$_themes=NULL;
+	$_debuglog=array();
+	$_debugstart=exactTime();
+
+	//Adds a line to the debug log
+	function debug_log($line){
+		if(DEBUG){
+			global $_debuglog;
+			global $_debugstart;
+			$now=exactTime()-$_debugstart;
+			$_debuglog[]="[$now] $line";
+		}
+		return $line;
+	}
+
+	//Gets the debug log
+	function debug_getLog(){
+		global $_debuglog;
+		debug_log('Debug: Log dump');
+		return implode(PHP_EOL,$_debuglog) . PHP_EOL;
+	}
+
+	//Gets an exact timestamp
+	function exactTime(){
+		if(function_exists('hrtime')){
+			//Convert nanoseconds to milliseconds
+			return hrtime(TRUE)/1000000;
+		}
+		//Convert microseconds to milliseconds
+		return explode(' ',microtime())[0]/1000;
+	}
 
 	//Dumps an object to the page
 	function dump($obj,&$dumped=NULL){
@@ -445,7 +475,7 @@
 	function resetConfig(){
 		return setConfig(NULL);
 	}
-	
+
 	//Gets all themes
 	function getThemes(){
 		global $_themes;
