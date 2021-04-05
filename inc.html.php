@@ -258,14 +258,13 @@
 
 		if(TRUE===($ret=update_cancheck())){
 			if(is_array($ret=update_check())){
-				//TODO Check OK
 				$latest=av($ret,'max');
 				if(is_string($latest)){
 					$release=av(av($ret,'versions'),$latest);
 					if($release){
 						$md=new Parsedown();
 						$buffer.='<h2>A newer version is available.</h2><p>
-							<a href="' . selfurl() . '?mode=update">Install ' . he($latest) . '</a></p>
+							<a href="' . selfurl() . '?action=update">Install ' . he($latest) . '</a></p>
 							<p>
 							Version: ' . he($latest) . '<br />
 							Title: ' . he($release['title']) .'<br />
