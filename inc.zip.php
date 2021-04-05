@@ -8,7 +8,7 @@
 		if(!is_string($name)){
 			return FALSE;
 		}
-		if(strlen($name===0)){
+		if(strlen($name)===0){
 			return '/';
 		}
 		
@@ -16,10 +16,6 @@
 		$name=str_replace(DIRECTORY_SEPARATOR,'/',$name);
 		//Replace consecutive slashes with one
 		$name=preg_replace('#/+#','/',$name);
-		//Make sure the path starts with a slash
-		if(strpos($name,'/')!==0){
-			$name="/$name";
-		}
 		return $name;
 	}
 	//Compresses a file or directory into a zip file
@@ -47,12 +43,15 @@
 					//Recursive directory processing works more like a FIFO queue rather than a LIFO stack.
 					$current=array_shift($stack);
 					//Build name for zip file entry by cutting off the common base
-					//Zip entries start with a slash so it's correct that we don't cut that one off.
-					$zip_current=substr($current,strlen($source));
+					$zip_current=substr($current,strlen($source)+1);
 					//In case we're on a system that doesn't uses a "/" as separator,
 					//for example Windows and IMAP.
 					$zip_current=zip_name($zip_current);
-					$zip->addEmptyDir($zip_current);
+					//Don't add the root directory. It always exists
+					if(strlen($zip_current)>0){
+						debug_log('ZIP: Add dir ' . $zip_current);
+						$zip->addEmptyDir($zip_current);
+					}
 					$entries=scandir($current);
 					foreach($entries as $e){
 						if($e==='.' || $e==='..'){
@@ -66,8 +65,9 @@
 						}
 						else{
 							//Files are added immediately.
-							$full=zip_name($full);
-							$zip->addFile($full,substr($full,strlen($zip_base)));
+							$entry=zip_name(substr($full,strlen($zip_base)+1));
+							debug_log('ZIP: Add file ' . $entry);
+							$zip->addFile($full,$entry);
 						}
 					}
 				}
@@ -92,7 +92,9 @@
 		$zip=new ZipArchive();
 		if($zip->open($zipfile)){
 			set_time_limit(0);
+			debug_log("Zip: Begin extract to $dest");
 			$ok=$zip->extractTo($dest);
+			debug_log("Zip: End extract to $dest");
 			set_time_limit(30);
 			$zip->close();
 			//Fix all timestamps of extracted files and directories
@@ -100,11 +102,14 @@
 			foreach($data['entries'] as $e){
 				if($fullname=realpath($dest . DIRECTORY_SEPARATOR . $e['name'])){
 					if(!@touch($fullname,$e['last-modified'])){
-						throw new  Exception('touch("' . $fullname . '",' . $e['last-modified'] . ') failed');
+						debug_log('Zip: touch("' . $fullname . '",' . $e['last-modified'] . ') failed');
+					}
+					else{
+						debug_log('Zip: touch("' . $fullname . '",' . $e['last-modified'] . ')');
 					}
 				}
 				else{
-					throw new  Exception('realpath(' . $dest . $e['name'] . ') failed');
+					debug_log('Zip: realpath(' . $dest . $e['name'] . ') failed');
 				}
 			}
 			//Don't mess with the timestamp of the base directory if we did not create it.
