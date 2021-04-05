@@ -75,7 +75,7 @@
 			$zip->close();
 			//Since we're technically not modifying the file data,
 			//we apply the modification date of the source to the zip
-			touch($zipname,filemtime($source));
+			@touch($zipname,filemtime($source));
 		}
 		return FALSE;
 	}
