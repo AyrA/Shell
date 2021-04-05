@@ -3,6 +3,8 @@
 		Primary shell entry point
 	*/
 	error_reporting(E_ALL);
+	//Debug mode
+	define('DEBUG',is_file(__DIR__ . DIRECTORY_SEPARATOR . '.debug'));
 
 	//Configuration file
 	//Always use an absolute path because some pages may change the working directory

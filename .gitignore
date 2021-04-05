@@ -1,3 +1,4 @@
 backup/
 inc.config.php
 .htaccess
+.debug
