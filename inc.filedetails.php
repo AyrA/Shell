@@ -189,14 +189,12 @@
 		if(strpos($name,'.')>0){
 			$name=substr($name,0,strpos($name,'.'));
 		}
-		$flags=defined('ZipArchive::RDONLY')?ZipArchive::RDONLY:0;
-		$zip=new ZipArchive();
-		if($zip->open($path,$flags)){
-			if($comment=$zip->getArchiveComment()){
+		$zipdata=zip_enum($path);
+		if($zipdata){
+			if($comment=av($zipdata,'comment')){
 				$buffer.='<h2>Comment:</h2><pre>' . he($comment) . '</pre>';
 			}
-			$entries=$zip->count();
-			if($entries===0){
+			if(count($zipdata['entries'])===0){
 				$buffer.='<i>This archive is empty</i>';
 			}
 			else{
@@ -208,24 +206,35 @@
 				$buffer.='<p class="err">Existing objects will be overwritten!</p>';
 				$buffer.='<h2>Contents:</h2>';
 				$buffer.='<table><tr><th>Name</th><th>Size</th><th>Compressed</th><th>Date</th><th>CRC</th></tr>';
-				for($i=0;$i<$entries;$i++){
-					$zipentry=$zip->statIndex($i);
+				foreach($zipdata['entries'] as $zipentry){
 					//Render directories in a different color
-					$isdir=strrpos($zipentry['name'],'/')===strlen($zipentry['name'])-1;
-					if($isdir){
+					if($zipentry['isdir']){
 						$buffer.='<tr><td colspan="3"><span class="zip-dir">' . he($zipentry['name']) . '</span></td>';
 					}
 					else{
 						$buffer.='<tr><td><span class="zip-file">' . he($zipentry['name']) . '</span>
-						<td>' . he(formatSize($zipentry['size'])) . '</td>
-						<td>' . he(formatSize($zipentry['comp_size'])) . '</td>';
+						<td>' . he(formatSize($zipentry['size']['real'])) . '</td>
+						<td>' . he(formatSize($zipentry['size']['compressed'])) . '</td>';
 					}
-					$buffer.='</td><td>' . he(userDate($zipentry['mtime'])) . '</td>
-					<td>' . he($isdir?'<dir>':sprintf('%X8',$zipentry['crc'])) . '</td></tr>';
+					$buffer.='</td><td>' . he(userDate($zipentry['last-modified'])) . '</td>
+					<td>' . he($zipentry['isdir']?'<dir>':$zipentry['crc']) . '</td></tr>';
 				}
 				$buffer.='</table>';
+				$diff=$zipdata['size']['real']-$zipdata['size']['compressed'];
+				$buffer.='<p>
+					Total compressed size: ' . he(formatSize($zipdata['size']['real'])) . '<br />
+					Total decompressed size: ' . he(formatSize($zipdata['size']['compressed'])) . '<br />
+					Compression ratio: ' .
+					round($zipdata['size']['compressed']/$zipdata['size']['real']*100,2) . '%' .
+					'; ';
+					if($diff>=0){
+						$buffer.='Reduced by ' . he(formatSize($diff));
+					}
+					else{
+						$buffer.='Increased by ' . he(formatSize(abs($diff)));
+					}
+					$buffer.='.</p>';
 			}
-			$zip->close();
 		}
 		else{
 			$buffer.='<h2 class="err">This zip file is damaged or not a zip</h2>'.

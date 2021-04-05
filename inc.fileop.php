@@ -158,16 +158,14 @@
 				}
 				exit(html(
 					'<b>Unable to create zip file</b><br />' .
-					'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+					backlink()));
 			}
 			exit(html(
 			'<b>Unknown mode. Only "zip" and "gz" are supported</b><br />' .
-			'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+			backlink()));
 
 		}
-		exit(html(
-			'<b>Missing parameters</b><br />' .
-			'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+		exit(html('<b>Missing parameters</b><br />' . backlink()));
 		return FALSE;
 	}
 
@@ -181,24 +179,16 @@
 			}
 			$mime=mime_content_type($file);
 			if($mime===MIME_ZIP){
-				$zip=new ZipArchive();
-				if($zip->open($file)){
-					set_time_limit(300);
-					$ok=$zip->extractTo($dest);
-					$zip->close();
-					if($ok){
-						redir(selfurl() . '?action=shell&path=' . urlencode($dest));
-						return TRUE;
-					}
-					else{
-						exit(html(
-							'<b>Unable to extract to ' . he(basename($dest)) . '</b><br />' .
-							'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
-					}
+				$ok=zip_decompress($file,$dest);
+				if($ok){
+					redir(selfurl() . '?action=shell&path=' . urlencode($dest));
+					return TRUE;
 				}
-				exit(html(
-					'<b>Unable to open ' . he(basename($file)) . ' as zip</b><br />' .
-					'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+				else{
+					exit(html(
+						'<b>Unable to extract to ' . he(basename($dest)) . '</b><br />' .
+						backlink()));
+				}
 			}
 			elseif($mime===MIME_GZ){
 				$base=basename($file);
@@ -212,7 +202,9 @@
 
 				if($in=gzopen($file,'rb')){
 					if($out=fopen($target,'wb')){
+						set_time_limit(0);
 						stream_copy_to_stream($in,$out);
+						set_time_limit(30);
 						fclose($out);
 						fclose($in);
 						touch($target,filemtime($file));
@@ -221,19 +213,15 @@
 					fclose($in);
 					exit(html(
 						'<b>Unable to open ' . he(basename($target)) . ' for writing</b><br />' .
-						'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+						backlink()));
 				}
 			}
 			else{
-				exit(html(
-					'<b>Unknown archive type for ' . he(basename($file)) . '</b><br />' .
-					'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+				exit(html('<b>Unknown archive type for ' . he(basename($file)) . '</b><br />' . backlink()));
 			}
 		}
 		else{
-			exit(html(
-				'<b>Invalid unzip command</b><br />' .
-				'<a href="#" class="backlink">&lt;&lt;Go Back</a>'));
+			exit(html('<b>Invalid unzip command</b><br />' . backlink()));
 		}
 		return FALSE;
 	}
