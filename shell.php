@@ -8,6 +8,7 @@
 
 	//Configuration file
 	//Always use an absolute path because some pages may change the working directory
+	//Note: This line will be reset to the default when you update.
 	define('CONFIG_FILE',__DIR__ . DIRECTORY_SEPARATOR . 'inc.config.php');
 
 	foreach(glob('inc.*.php') as $f){
