@@ -227,15 +227,15 @@
 		$ret=TRUE;
 		$dir=@opendir($src);
 		if($dir){
-			$ret&=(@file_exists($dst) && @is_dir($dst)) || @mkdir($dst);
+			$ret=$ret && (@is_dir($dst) || @mkdir($dst));
 			if($ret){
 				while(FALSE!==($file=readdir($dir))){
 					if(($file!=='.') && ($file!=='..')){
 						if(is_dir($src . $dirsep . $file)){
-							$ret&=dircopy($src . $dirsep . $file,$dst . $dirsep . $file);
+							$ret=$ret && dircopy($src . $dirsep . $file,$dst . $dirsep . $file);
 						}
 						else{
-							$ret&=@copy($src . $dirsep . $file,$dst . $dirsep . $file);
+							$ret=$ret && @copy($src . $dirsep . $file,$dst . $dirsep . $file);
 						}
 					}
 				}
