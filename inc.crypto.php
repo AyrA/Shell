@@ -131,6 +131,22 @@
 
 		$info=enc_get_info($path);
 		$ciphers=enc_get_ciphers();
+		if(!in_array(CRYPTO_DEFAULT,$ciphers['safe'])){
+			$report=array(
+				'CRYPTO_DEFAULT'=>CRYPTO_DEFAULT,
+				'CRYPTO_UNSAFE'=>CRYPTO_UNSAFE,
+				'SHELL_VERSION'=>SHELL_VERSION,
+				'PHP_VERSION'=>PHP_VERSION,
+				'safe'=>$ciphers['safe']
+			);
+			die(html(homeForm() . '<h1 class="err">CRYPTO_DEFAULT is unsafe</h1>
+			<p class="err">
+			CRYPTO_DEFAULT in ' . he(basename(__FILE__)) . ' is not set to a safe cipher.
+			If you did not change the constant,
+			report this problem to author on Github.
+			Please include this detail:
+			<div class="hex">' . he(json_encode($report)) . '</div></p>' . backlink()));
+		}
 
 		$post=array();
 		foreach(array('password2','password1','output','algo','mode') as $m){
@@ -204,20 +220,21 @@
 				'<input type="hidden" name="algo" value="' . he($info['mode']) . '" />';
 		}
 		else{
-		$select='<select name="algo" required><option value="">-- Please select --</option>' .
-			'<option value="' . he(CRYPTO_DEFAULT) .  '">Recommended (' . he(CRYPTO_DEFAULT) .  ')</option>';
+			$select='<select name="algo" required><option value="">-- Please select --</option>' .
+				'<option ' . (CRYPTO_DEFAULT===$algo?'selected':'') . ' value="' . he(CRYPTO_DEFAULT) .  '">Recommended (' . he(CRYPTO_DEFAULT) .  ')</option>';
+			$safe_options='';
+			foreach($ciphers['safe'] as $c){
+				//Don't list the default algorithm again
+				if($c!==CRYPTO_DEFAULT){
+					$safe_options.='<option' . ($c===$algo?' selected':'') . '>' . he($c) . '</option>';
+				}
+			}
 			//Don't show the optgroup for safe ciphers if no unsafe ciphers are available at all
 			if(count($ciphers['safe'])>0 && count($ciphers['unsafe'])>0){
-				$select.='<optgroup label="Safe ciphers">';
-				foreach($ciphers['safe'] as $c){
-					if($c===$algo){
-						$select.='<option selected>' . he($c) . '</option>';
-					}
-					else{
-						$select.='<option>' . he($c) . '</option>';
-					}
-				}
-				$select.='</optgroup>';
+				$select.='<optgroup label="Safe ciphers">' . $safe_options . '</optgroup>';
+			}
+			else{
+				$select.=$safe_options;
 			}
 			//Unsafe ciphers are always below the safe ones
 			if(count($ciphers['unsafe'])>0){
