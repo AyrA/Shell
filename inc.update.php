@@ -143,75 +143,92 @@
 			return "'$zipfile' does not contains a 'Shell-*' main directory. File corrupt?";
 		}
 		debug_log("Update: New shell directory detected as '$shelldir'");
-		//Delete existing shell but leave dotfiles intact
-		$del_pending=array(__DIR__);
-		$del_skip=array(__DIR__);
-		$del_dirs=array();
-		while(count($del_pending)){
-			$current=array_pop($del_pending);
-			debug_log("Update: Scanning $current");
-			foreach(scandir($current) as $entry){
-				$full=realpath($current . DIRECTORY_SEPARATOR . $entry);
-				//Realpath will resolve symlinks.
-				//If this happens and we land outside of the current directory,
-				//we just delete the link but do not follow it.
-				//If the link is inside of the current directory,
-				//we treat is as a file and and just unlink it
-				//regardless of whether it points to a file or directory.
-				if(strpos($full,$current . DIRECTORY_SEPARATOR)!==0){
-					debug_log("Update: Symlink '$entry' points to outside directory: '$full'");
-					if(!DEBUG && !@unlink($full)){
-						debug_log("Update: Failed to delete link '$full'");
-					}
-					else{
-						debug_log("Update: Removed link '$full'");
-					}
-				}
-				elseif(strpos($entry,'.')!==0){
-					if(is_file($full) || is_link($full)){
-						if(!DEBUG && !@unlink($full)){
-							debug_log("Update: Failed to delete file '$full'");
-						}
-						else{
-							debug_log("Update: Removed file '$full'");
-						}
-					}
-					else{
-						$del_pending[]=$full;
-					}
-				}
-				elseif($entry!=='.' && $entry!=='..'){
-					debug_log("Will not delete dotfile: '$full'");
-					$del_skip[]=$full;
-				}
-			}
-			//Delete the current directory
-			if(!in_array($current,$del_skip)){
-				$del_dirs[]=$current;
-			}
-			else{
-				debug_log("Update: Skip removal of '$current'");
+		$config=getConfig();
+		//Delete existing shell
+		update_delshell(__DIR__);
+
+		//Copy new shell
+		if(!DEBUG){
+			if(!dircopy("$temp/$shelldir",__DIR__)){
+				return "Cannot copy '$temp/$shelldir' to " . __DIR__ . ". Disk full?";
 			}
 		}
-		//Delete all scanned directories that were marked for removal
-		while(count($del_dirs)){
-			$current=array_pop($del_dirs);
-				debug_log("Update: Deleting directory $current");
-				if(!DEBUG && !@rmdir($current)){
-					debug_log("Update: Failed to delete directory '$current'");
-				}
-				else{
-					debug_log("Update: Deleted directory '$current'");
-				}
-		}
-		//TODO: Copy new shell
-		//TODO: Apply settings again
+		//Delete the temporary copy
+		@rdrec($temp);
+
+		//Apply settings again
+		setConfig($config);
+
 		if(DEBUG){
 			header('Content-Type: text/plain; charset=utf-8');
 			echo debug_getLog();
 		}
-		return $temp;
+		return TRUE;
 	}
+
+	//Deletes a directory recursively but leaves dotfiles intact
+	function update_delshell($base){
+		//If this is TRUE, it will try to delete $base.
+		//Set to FALSE whenever a sub-item can't be deleted.
+		$delete_current=TRUE;
+		$current=realpath($base);
+		if(!$current){
+			return FALSE;
+		}
+		debug_log("Update: Scanning $current");
+		foreach(scandir($current) as $entry){
+			$full=realpath($current . DIRECTORY_SEPARATOR . $entry);
+			//Realpath will resolve symlinks.
+			//If this happens and we land outside of the current directory,
+			//we just delete the link but do not follow it.
+			//If the link is inside of the current directory,
+			//we treat is as a file and and just unlink it
+			//regardless of whether it points to a file or directory.
+			if(strpos($full,$current . DIRECTORY_SEPARATOR)!==0){
+				debug_log("Update: Symlink '$entry' points to outside directory: '$full'");
+				if(!DEBUG && !@unlink($full)){
+					$delete_current=FALSE;
+					debug_log("Update: Failed to delete link '$full'");
+				}
+				else{
+					debug_log("Update: Removed link '$full'");
+				}
+			}
+			elseif(strpos($entry,'.')!==0){
+				if(is_file($full) || is_link($full)){
+					if(!DEBUG && !@unlink($full)){
+						$delete_current=FALSE;
+						debug_log("Update: Failed to delete file '$full'");
+					}
+					else{
+						debug_log("Update: Removed file '$full'");
+					}
+				}
+				else{
+					$delete_current=$delete_current && update_delshell($full);
+				}
+			}
+			elseif($entry!=='.' && $entry!=='..'){
+				$delete_current=FALSE;
+				debug_log("Will not delete dotfile: '$full'");
+			}
+		}
+		//Delete the current directory
+		if($delete_current){
+			if(!DEBUG && !@rmdir($full)){
+				$delete_current=FALSE;
+				debug_log("Update: Failed to delete directory '$full'");
+			}
+			else{
+				debug_log("Update: Deleted directory '$full'");
+			}
+		}
+		else{
+			debug_log("Update: Will not delete '$full' because it's not empty");
+		}
+		return $delete_current;
+	}
+
 
 	//Shows update HTML
 	function showUpdate(){
