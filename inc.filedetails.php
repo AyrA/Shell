@@ -126,9 +126,27 @@
 						'</div>';
 					}
 					else{
-						$buffer.='<div><form method="post"><textarea rows="25" class="max accept-tab" name="content">' . he($data) . '</textarea><br />' .
-						'<input type="submit" value="Save Changes" /><input type="reset" value="Discard Changes" />' .
-						'<label><input type="checkbox" name="keeptime" value="y" ' . (av($config,'keep-modified')===TRUE?'checked':'') . ' /> Try to keep modify timestamp</label></form></div>';
+						if(preg_match('#\.md$#i',$path)){
+							$md=new Parsedown();
+							//Markdown file
+							$buffer.='<div><div class="row-2">
+							<form method="post">
+							<textarea rows="25" class="max accept-tab" name="content">' .
+							he($data) .
+							'</textarea><br />
+							<input type="submit" value="Save Changes" />
+							<input type="reset" value="Discard Changes" />
+							<label><input type="checkbox" name="keeptime" value="y" ' .
+							(av($config,'keep-modified')===TRUE?'checked':'') .
+							' /> Try to keep modify timestamp</label></form></div>
+							<div class="row-2 limit-height top-align">
+							<p><i>This is a markdown preview of the current file. Save the file to update the preview.</i></p>' . ($md->text($data)) . '</div></div>';
+						}
+						else{
+							$buffer.='<div><form method="post"><textarea rows="25" class="max accept-tab" name="content">' . he($data) . '</textarea><br />' .
+								'<input type="submit" value="Save Changes" /><input type="reset" value="Discard Changes" />' .
+								'<label><input type="checkbox" name="keeptime" value="y" ' . (av($config,'keep-modified')===TRUE?'checked':'') . ' /> Try to keep modify timestamp</label></form></div>';
+						}
 					}
 					break;
 				case 'image':
