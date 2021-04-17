@@ -4,7 +4,7 @@
 	*/
 
 	//Shell version
-	define('SHELL_VERSION','1.1.1');
+	define('SHELL_VERSION','1.1.2');
 	//Date format for HTTP headers
 	define('HTTP_DATE','D, d M Y H:i:s T');
 	//The date format for whenever a date is being displayed
