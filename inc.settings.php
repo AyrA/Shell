@@ -29,6 +29,7 @@
 			$config['ini-strip-comments']=av($_POST,'ini-strip-comments')==='1';
 			$config['unsafe-crypto']=av($_POST,'unsafe-crypto')==='1';
 			$config['keep-modified']=av($_POST,'keep-modified')==='1';
+			$config['update-prerelease']=av($_POST,'update-prerelease')==='1';
 			$theme=av($_POST,'theme');
 			if($theme && is_array(av(getThemes(),$theme))){
 				$config['theme']=$theme;
@@ -137,6 +138,8 @@
 						Only uses stdout. Causes programs that wait for input to hang indefinitely.
 						Useful for commands that write a lot to stderr
 					</small><br />
+					<label><input type="checkbox" name="update-prerelease" value="1" ' . (av($config,'update-prerelease')?'checked':'') . '/> Search for beta updates</label><br />
+					<small>When searching for updates, include beta versions</small><br />
 					<label><input type="checkbox" name="allowbots" value="1" ' . (av($config,'allowbots')?'checked':'') . '/> Allow robot access</label><br />
 					<small>Allows access by automated tools and known bots</small><br />
 					Theme: <select name="theme" id="themebox">';
