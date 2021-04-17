@@ -251,6 +251,7 @@
 
 	//Shows the main menu
 	function showMainMenu(){
+		$config=getConfig();
 		$buffer='<h1>Secure Shell</h1>';
 		$buffer.=getActions();
 		$buffer.='<p>Current version: ' . SHELL_VERSION . '</p>';
@@ -258,25 +259,37 @@
 
 		if(TRUE===($ret=update_cancheck())){
 			if(is_array($ret=update_check())){
-				$latest=av($ret,'max');
-				if(is_string($latest)){
-					$release=av(av($ret,'versions'),$latest);
+				$latest=update_getlatest();
+				$release=av($ret,$latest);
+				$md=new Parsedown();
+				if(update_hasupdate()){
+					$versions=update_listupdates();
 					if($release){
-						$md=new Parsedown();
 						$buffer.='<h2>A newer version is available.</h2><p>
-							<a href="' . selfurl() . '?action=update">Install ' . he($latest) . '</a></p>
-							<p>
-							Version: ' . he($latest) . '<br />
-							Title: ' . he($release['title']) .'<br />
-							Details: <div class="update-desc">' . $md->text($release['desc']) .'</div>
-							</p>';
+							<a href="' . selfurl() . '?action=update">Install ' . he($latest) . '</a></p>';
+							foreach($versions as $v){
+								$release=av($ret,$v);
+								$buffer.='<h2>Version: ' . he($v) . '</h2>';
+								if($release['beta']){
+									$buffer.='<p class="err">This is a beta release and may be unstable';
+									if(!av($config,'update-prerelease')){
+										$buffer.='<br /><i>To install this version, enable pre releases in the settings.</i>';
+									}
+									$buffer.='</p>';
+								}
+								$buffer.='<p>
+								Title: ' . he($release['title']) .'<br />
+								Details: <div class="update-desc">' . $md->text($release['desc']) .'</div>
+								</p>';
+							}
 					}
 					else{
 						$buffer.='<p class="err">Version data invalid. Try resetting the version cache in your settings.</p>';
 					}
 				}
 				else{
-					$buffer.='<p>No versions published yet.</p>';
+					$buffer.='<p>You are on the latest version. Latest changes</p>';
+					$buffer.='<div class="update-desc">' . $md->text($release['desc']) .'</div>';
 				}
 			}
 			elseif(is_string($ret)){

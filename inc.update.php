@@ -33,22 +33,15 @@
 					'desc'=>'This is the current state of the [github master branch](https://github.com/AyrA/Shell).',
 					'download'=>'https://github.com/AyrA/Shell/archive/refs/heads/master.zip',
 					'title'=>'Git Master',
-					'date'=>time()
+					'date'=>time(),
+					'beta'=>TRUE
 				);
 			}
 			foreach($tags as $tag){
 				//Our tags will be in the format "vX.Y.Z" so we cut off the "v" to get a raw version
 				$version=substr(av($tag,'tag_name'),1);
-				if($vmax){
-					$vmax=version_compare($vmax,$version)<0?$version:$vmax;
-				}
-				else{
-					$vmax=$version;
-				}
 				//Ignore drafts
 				if(!av($tag,'draft')){
-					//Add pre-releases if the user decides to
-					if(av($config,'update-prerelease')===TRUE || av($tag,'prerelease')!==TRUE)
 					$ret[$version]=array(
 						'desc'=>av($tag,'body'),
 						'download'=>av($tag,'zipball_url'),
@@ -58,20 +51,45 @@
 					);
 				}
 			}
-			$config['version-cache']=array('time'=>time(),'data'=>array('max'=>$vmax,'versions'=>$ret));
+			$config['version-cache']=array('time'=>time(),'data'=>$ret);
 			setConfig($config);
 			return $config['version-cache']['data'];
 		}
 		return FALSE;
 	}
 
+	//Gets the latest installable version
+	function update_getlatest(){
+		$vmax=SHELL_VERSION;
+		$config=getConfig();
+		if(is_array($data=update_check())){
+			foreach($data as $version=>$data){
+				if(!$data['beta'] || av($config,'update-prerelease')){
+					$vmax=version_compare($vmax,$version)<0?$version:$vmax;
+				}
+			}
+		}
+		return $vmax;
+	}
+
 	//Check if the latest version is newer than the currently used version
 	function update_hasupdate(){
-		$data=update_checkupdate();
-		if(!is_array($data) || count($data['versions'])===0){
+		return version_compare(SHELL_VERSION,update_getlatest())<0;
+	}
+
+	//Gets all versions that are newer than the current version
+	function update_listupdates(){
+		$ret=array();
+		$data=update_check();
+		if(!is_array($data) || count($data)===0){
 			return FALSE;
 		}
-		return version_compare(SHELL_VERSION,$data['max'])<0;
+		foreach(array_keys($data) as $v){
+			if(version_compare(SHELL_VERSION,$v)<0){
+				$ret[]=$v;
+			}
+		}
+		return $ret;
 	}
 
 	//Prepares for an update
@@ -86,8 +104,13 @@
 			@rdrec($temp);
 			return 'Unable to check for updates';
 		}
+		$vmax=update_getlatest();
+		if($vmax===SHELL_VERSION){
+			@rdrec($temp);
+			return 'No new version available';
+		}
 		//Check if a version is present
-		$latest=av($update['versions'],av($update,'max'));
+		$latest=av($update,$vmax);
 		if(!$latest){
 			@rdrec($temp);
 			return 'No releases in the shell repository.';
