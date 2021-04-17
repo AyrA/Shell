@@ -279,7 +279,7 @@
 								}
 								$buffer.='<p>
 								Title: ' . he($release['title']) .'<br />
-								Details: <div class="update-desc">' . $md->text($release['desc']) .'</div>
+								<div class="update-desc">Details:<br />' . $md->text($release['desc']) .'</div>
 								</p>';
 							}
 					}
@@ -288,8 +288,8 @@
 					}
 				}
 				else{
-					$buffer.='<p>You are on the latest version. Latest changes</p>';
-					$buffer.='<div class="update-desc">' . $md->text($release['desc']) .'</div>';
+					$buffer.='<p>You are on the latest version.</p>';
+					$buffer.='<div class="update-desc">Latest changes:<br />' . $md->text($release['desc']) .'</div>';
 				}
 			}
 			elseif(is_string($ret)){

@@ -53,14 +53,14 @@
 			}
 			$config['version-cache']=array('time'=>time(),'data'=>$ret);
 			setConfig($config);
-			return $config['version-cache']['data'];
+			return $ret;
 		}
 		return FALSE;
 	}
 
 	//Gets the latest installable version
 	function update_getlatest(){
-		$vmax=SHELL_VERSION;
+		$vmax='0.0.0';
 		$config=getConfig();
 		if(is_array($data=update_check())){
 			foreach($data as $version=>$data){
