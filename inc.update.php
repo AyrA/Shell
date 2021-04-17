@@ -47,11 +47,14 @@
 				}
 				//Ignore drafts
 				if(!av($tag,'draft')){
+					//Add pre-releases if the user decides to
+					if(av($config['update-prerelease'])===TRUE || av($tag,'prerelease')!==TRUE)
 					$ret[$version]=array(
 						'desc'=>av($tag,'body'),
 						'download'=>av($tag,'zipball_url'),
 						'title'=>av($tag,'name'),
 						'date'=>strtotime(av($tag,'published_at')),
+						'beta'=>av($tag,'prerelease')===TRUE,
 					);
 				}
 			}
@@ -130,8 +133,10 @@
 		}
 
 		//Find the unpacked directory
+		//The main directory is normally in the "repository-tag" format,
+		//but using the API yields "user-repository-tag-id" format
 		$shelldir=NULL;
-		foreach(glob($temp . '/Shell-*') as $dir){
+		foreach(array_merge(glob($temp . '/Shell-*'),glob($temp . '/AyrA-Shell-*')) as $dir){
 			//There should ever be only one directory, but just in case github changes the format,
 			//We search for the directory that contains the shell.php file.
 			if(is_dir($dir) && is_file($dir . DIRECTORY_SEPARATOR . 'shell.php')){
