@@ -48,7 +48,7 @@
 				//Ignore drafts
 				if(!av($tag,'draft')){
 					//Add pre-releases if the user decides to
-					if(av($config['update-prerelease'])===TRUE || av($tag,'prerelease')!==TRUE)
+					if(av($config,'update-prerelease')===TRUE || av($tag,'prerelease')!==TRUE)
 					$ret[$version]=array(
 						'desc'=>av($tag,'body'),
 						'download'=>av($tag,'zipball_url'),
